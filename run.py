@@ -39,4 +39,4 @@ if args.migrate:
 
 # Chạy server nếu có tham số --runserver
 if args.runserver:
-    os.system('python manage.py runserver')
+    os.system('python manage.py runserver 0.0.0.0:8000')
