@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from .models import User,Post
 from django.contrib import messages
@@ -73,13 +73,46 @@ def processLogin(request):
 
 
 
+# def addPost(request):
+#     if request.method =='POST':
+#         title = request.POST.get('title')
+#         content = request.POST.get('content')
+#         user = User.objects.get(id=request.session.get('user_id'))
+#         post = Post.objects.create(user=user, title=title, content=content)
+#         post.save()
+#         posts = Post.objects.filter(user_id=request.session.get('user_id'))
+#         context={'username':request.session.get('user_name'),'user_id':request.session.get('user_id'),"posts":posts}
+#         return render(request,'blog/userhome.html',context)
+#     return render(request, 'blog/userhome.html', context)
+
+def userHome(request):
+    posts = Post.objects.filter(user_id=request.session.get('user_id'))
+    context = {
+        'username': request.session.get('user_name'),
+        'user_id': request.session.get('user_id'),
+        "posts": posts
+    }
+    return render(request, 'blog/userhome.html', context)
+
+
 def addPost(request):
-    if request.method =='POST':
+    if request.method == 'POST':
+        # Lấy dữ liệu từ form
         title = request.POST.get('title')
         content = request.POST.get('content')
         user = User.objects.get(id=request.session.get('user_id'))
+        
+        # Tạo post mới
         post = Post.objects.create(user=user, title=title, content=content)
-        post.save()
-        posts = Post.objects.filter(user_id=request.session.get('user_id'))
-        context={'username':request.session.get('user_name'),'user_id':request.session.get('user_id'),"posts":posts}
-        return render(request,'blog/userhome.html',context)
+        
+        # Chuyển hướng đến trang userhome sau khi xử lý POST
+        return redirect('user_home')  # Chuyển hướng tới trang userhome bằng tên URL pattern
+
+    # Yêu cầu GET hoặc sau khi chuyển hướng từ POST
+    posts = Post.objects.filter(user_id=request.session.get('user_id'))
+    context = {
+        'username': request.session.get('user_name'),
+        'user_id': request.session.get('user_id'),
+        "posts": posts
+    }
+    return render(request, 'blog/userhome.html', context)
